@@ -16,7 +16,7 @@ Genearlly speaking, [TalkingData](https://www.talkingdata.com/product-AdTracking
 
 TalkingData's AdTracking Service provides business insights using mobile's clicking amoungt in a short period (mainly for **advertisements**). Like an outsourcing service, TalkingData will charge you in different modes. 
 
-![Adtracking](images/Adtracking.png)
+![Adtracking](images/adtrac.png)
 
 ### 1.3 TalkingData's Anti-Cheating Service
 ------------
