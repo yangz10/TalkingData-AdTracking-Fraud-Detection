@@ -1,6 +1,7 @@
 # TalkingData  Fraud Detection
 
 ## 1. Barckground and Introduction
+------------
 
 ### 1.1 TalkingData Company
 ------------
@@ -22,7 +23,7 @@ TalkingData's AdTracking Service provides business insights using mobile's click
 
 If we are using the AdTracking Service, we will have this dashboard to monitor our applications operations situations. For Anti-Cheating part, TalkingData will rank the "Fraud Click" based on several calculations. Even if we want to explore more about this service, we still stop here because we need to register an account.
  
-![dashboard](images/dashboard.png)
+![dashboard](images/dashboard.png){:height="700px" width="400px"}
 
 ### 1.4 Business Value and Objective
 ------------
