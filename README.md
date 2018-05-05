@@ -137,8 +137,34 @@ For them, chaning IP address increases cost for them.
 
 **Conclusion 3.0 : When create features, we still should consider IP address.**
  
+ 
+## 4.0 Feature Enginerrring
+
+We borrow ideas from [https://www.kaggle.com/nanomathias/feature-engineering-importance-testing](https://www.kaggle.com/nanomathias/feature-engineering-importance-testing) 
 
 
+#### 1.Next Click 
+
+After sorting all data based on time, we will caculate the time interval to for next click using similar app, os or other informaiton. We use create all realted features. 
+
+#### 2.Previous Click 
+
+Similar to **Next Click**, we also check back about the data.
+
+#### 3.Cumulate Sum
+
+According to previous assumptions, we also calculate previous clicks using same devices.
+
+#### 4.Statistics
+
+Mean and variance are calculated because they measure the stationary of certian data series. If the series fluctuates frequentely, these metrics will have large changes.
+
+#### 5. Deep Learning
+
+After creating the final metrics, we use neutral networks (multi-layer perceptions) to help us do feature engineering. A very deep neutral network helps us tranfrom each category features at first. Then, we compress all these data into 10 dimensions. With the final target, we extract the hidden layers as new features.
+
+
+## 5.0 Modelling
 
 
 
