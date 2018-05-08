@@ -152,6 +152,10 @@ For them, changing IP address increases cost for them. They would like to be blo
 
 We borrow ideas from [https://www.kaggle.com/nanomathias/feature-engineering-importance-testing](https://www.kaggle.com/nanomathias/feature-engineering-importance-testing) This Kaggle kernel is the most insightful kernel for feature engineering based on many previous kernels. It guides us to generate similar features at first.
 
+### 4.1 Feature Creation
+
+In this part, we mainly create 8 features categories.
+
 #### 0. Preprocessing Time Features
 
 To prepare for later feature engineering, all time features have been created at first. These features include day, hour, minute and seconds.
@@ -187,11 +191,44 @@ Using similar strategies, we also calculate the mean, variance, count and unique
 
 We also use the original 7 features including IP, Devices and so on. 
 
-- 8. Original Features
+- 8.Original Features
 
 #### Summary 
 
 Based on previous analysis and feature engineering, we use and create 8 categories features for our models. Even though some features may not work very well, we just creat them together and check them one by one. 
+
+Actually, in the common kenels, many other features are used. For example, some people calculate prior probability like Prob(Click | Device). This feature can only be calculated in training process not in test dataset.
+
+### 4.2 Feature Importance
+
+At first, we try to use XGBoost (boosting trees) to build the model. However, our personal computer will load the whole trian and test dataset for more than 5 mins (180 M lines for each file). Due to insufficient RAM, we try to find some solutions from Kaggle discussion part. 
+
+**Suggesstions**:
+
+- Build Database using SQL to load data
+- Using Lightgbm to train the model
+- Using other python packages like Feature or pickle
+- Using cloud computing power
+
+In our example, this is part of our feature records using same dataset and same hyperparamters. We modify this [script](https://www.kaggle.com/asraful70/talkingdata-added-new-features-in-lightgbm/code) using Lightgbm and run this script in Amazon Web Server - Elective Container 2 (AWS EC2) to derive our final feature importance. We run the dataset many times. The issue here is that these feature importances may change if we use different dataset to generate the result. As a consequence, we relize that we should try to use different parts of the dataset to train our model.
+
+![importRecord](images/importRecord.png)
+
+**First Round Filter:** At first, we keep all features will accuracy more than 0.95 from the validation set. However, we notice that these featutures are very likely to be overfitting. 
+
+**Second Round Filter:** Although correlation matrix will help us identify relationship between different features, we finally decided to use Lightgbm feature importance figure to guide use. Below graph is the feature importance (We use X0 to X8 because too many combinations, which makes it hard to find corresponding code to modify...).
+
+![featureImport](images/featureImport.png)
+
+To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We are very busy with current take-home exams. Moreover, to compute all data rapidly, we need many CPUs and RAM for accelartion of current training process. Even if we use this powerful instance, each training will cost 2-3 hours. Each model will occupy nearly 13.3 GB RAM. Each time, we will train nearly 8 models (This will be discussed later).  
+
+[Figure Link](https://aws.amazon.com/blogs/aws/expanding-the-m4-instance-type-new-m4-16xlarge/)
+
+![aws](images/aws.png)
+
+
+
+
 
 
 #### 5. Deep Learning
