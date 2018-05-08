@@ -1,7 +1,7 @@
 # TalkingData  Fraud Detection
 
 
-## 1. Background and Introduction
+## 1.0 Background and Introduction
 
 ### 1.1 TalkingData Company
 ---
@@ -54,7 +54,7 @@ With all these information, our task is to detect the "click fraud" behavior. To
 - Low probability : Fraud Click 
 - High probability : Real Click
 
-## 3. Data Exploration 
+## 3.0 Data Exploration 
 
 Because the total training data size is really **huge** (184 million lines), we only use part of the data (100k lines) for exploration analysis in my dataset. To quickly start to understand the dataset, we borrow ideas from other people's exploratory data analysis (which saves much time for us). 
 
@@ -156,29 +156,29 @@ We borrow ideas from [https://www.kaggle.com/nanomathias/feature-engineering-imp
 
 In this part, we mainly create 8 features categories.
 
-#### 0. Preprocessing Time Features
+#### 4.1.0 Preprocessing Time Features
 
 To prepare for later feature engineering, all time features have been created at first. These features include day, hour, minute and seconds.
 
 ![time](images/time.png)
 
-#### 1.Next Click 
+#### 4.1.1 Next Click 
 
 After sorting all data based on time, all data will be grouped by similar device, os or other informations (no more than three combinations). After this, we will calculate the time differences to for each record using similar app, os or other information. To help training process, we fill all missing valeus with -99. 
 
 ![nextClick](images/nextClick.png)
 
-#### 2.Previous Click 
+#### 4.1.2 Previous Click 
 
 Similar to **Next Click**, we also check back about the data. This part will be shown together with Cumulate Sum.
 
-#### 3.Cumulate Sum
+#### 4.1.3 Cumulate Sum
 
 After grouping all data, we calculate the cumulate sume of concurrency. 
 
 ![nextClick](images/cum.png)
 
-#### 4.Statistics
+#### 4.1.4 Statistics
 
 Using similar strategies, we also calculate the mean, variance, count and unique values of concurrency of each groups. Mean and variance is calculated because they measure the stationary of certain data series. If the series fluctuates frequently, these metrics will have large changes. Unique values will provide some information if same combinations have show up in our historical records.
 
@@ -187,13 +187,13 @@ Using similar strategies, we also calculate the mean, variance, count and unique
 - 6.Count
 - 7.Unique Values
 
-#### 6.Original Features
+#### 4.1.5 Original Features
 
 We also use the original 7 features including IP, Devices and so on. 
 
 - 8.Original Features
 
-#### Summary 
+#### 4.1.6 Summary 
 
 Based on previous analysis and feature engineering, we use and create 8 categories features for our models. Even though some features may not work very well, we just creat them together and check them one by one. 
 
@@ -220,14 +220,52 @@ In our example, this is part of our feature records using same dataset and same 
 
 ![featureImport](images/featureImport.png)
 
-To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We are very busy with current take-home exams. Moreover, to compute all data rapidly, we need many CPUs and RAM for accelartion of current training process. Even if we use this powerful instance, each training will cost 2-3 hours. Each model will occupy nearly 13.3 GB RAM. Each time, we will train nearly 8 models (This will be discussed later).  
+**Third Round Filter:** Some features related to time are very important. However, our current algorithems are very slow to compute all required features. As a consequence, we use some "rough" calculations to replace "accurate" calculations. This approach is manily prepared for time related features.  
+
+**Computing Power Assistance**
+
+To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We are very busy with current **take-home exams**. Moreover, to compute all data rapidly, we need many CPUs and RAM for accelartion of current training process. Even if we use this powerful instance, each training will cost 2-3 hours. Each model will occupy nearly 13.3 GB RAM. Each time, we will train nearly 8 models (This will be discussed later). And, we only have no more than three days for this competition.  
 
 [Figure Link](https://aws.amazon.com/blogs/aws/expanding-the-m4-instance-type-new-m4-16xlarge/)
 
 ![aws](images/aws.png)
 
 
+## 5.0 Modelling
 
+### 5.1 Chaning Dataset - Lightbgm and Neutral Network
+
+Our first model is Lightbgm and next it netrual networks. Because Lightgbm and XBoost are very very similar. So, we want to use these "familar" models. According to the kernels at that time, people have relized that different dataset will have different results. As a reuslt, we build many Lightgbm models using different dataset. 
+
+Af first, we will split our training dataset based on different days - Day 6, Day 7, Day 8, Day 9. This also corresponds to our insights from time pattern (no time patterns). 
+
+For the training part, we use Day 6, Day 7, Day 8 and Day 9 seperately to train the model, then Day 6, Day 7, Day 8 and Day 9 as validation dataset. Day 6 has 10M data, Day 7 has 50M, Day 8 has 50M, Day 9 has 40M.
+
+Genarlly Speaking models are as follow : (Here.. I forget the results.. )
+<p align="center">
+
+| Training Dataset  | Validation Dataset | 
+| ------------- | ------------- |
+| Day 6  | Day 6  | 
+| Day 7  | Day 7  |
+| Day 8| Day 8 |
+|Day 9| Day 9 |
+|Day 6| Day 7 |
+|Day 6| Day 8|    
+|...| ...| 
+</p>
+
+After confirming the dataset to use as trianing and validating dataset, we try to trune the parameters. (Here, we also use the full dataset to train the model, this gives us better result.) Here, we have nearly 10-30 models, I don't remember actually. Because I blend each ten models and submit it to public board to test my guess and model. Then, we will decide next steps.
+
+### 5.2 Self-defined Models
+
+We build a model using previous models.
+
+#### 5.2.1
+
+Inspired by previous models, we use 8 neural networks to train each feature categories. Although our netural networks are not so deep, each layers has many units. This NN structure makes our model very very easily overfiting. To control these, we use dropout for all hidden layers (drop 50% neutros).  
+
+![nn](images/nn.png)
 
 
 
@@ -235,8 +273,15 @@ To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We a
 
 After creating the final metrics, we use neural networks (multi-layer perceptions) to help us do feature engineering. A very deep neutral network helps us transform each category features at first. Then, we compress all these data into 10 dimensions. With the final target, we extract the hidden layers as new features.
 
+### 5.3 Model Blend
 
-## 5.0 Modelling
+We use simple mean of all current model results to blend all model predictions. This actually gives us a more stable result although we lose the probability to reach a very high score.
+
+
+## 6.0 Modelling
+
+![result](images/result.png)
+
 
 
 
