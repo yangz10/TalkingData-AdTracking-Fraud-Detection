@@ -233,7 +233,7 @@ To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We a
 
 ## 5.0 Modelling
 
-### 5.1 Chaning Dataset - Lightbgm and Neutral Network
+### 5.1 Chaning Dataset and hyperparameters - Lightbgm and Neutral Network
 
 Our first model is Lightbgm and next it netrual networks. Because Lightgbm and XBoost are very very similar. So, we want to use these "familar" models. According to the kernels at that time, people have relized that different dataset will have different results. As a reuslt, we build many Lightgbm models using different dataset. 
 
@@ -255,30 +255,72 @@ Genarlly Speaking models are as follow : (Here.. I forget the results.. )
 |...| ...| 
 </p>
 
-After confirming the dataset to use as trianing and validating dataset, we try to trune the parameters. (Here, we also use the full dataset to train the model, this gives us better result.) Here, we have nearly 10-30 models, I don't remember actually. Because I blend each ten models and submit it to public board to test my guess and model. Then, we will decide next steps.
+After confirming the dataset to use as trianing and validating dataset, we try to trune the parameters. (Here, we also use the full dataset to train the model, this gives us better result.) Here, we have nearly **10-30 models**, I don't remember actually. Because I blend each ten models and submit it to public board to test my guess and model. Then, we will decide next steps.
 
 ### 5.2 Self-defined Models
 
 We build a model using previous models.
 
-#### 5.2.1
+#### 5.2.1 Feature Generation
 
-Inspired by previous models, we use 8 neural networks to train each feature categories. Although our netural networks are not so deep, each layers has many units. This NN structure makes our model very very easily overfiting. To control these, we use dropout for all hidden layers (drop 50% neutros).  
+Inspired by previous models, we use 8 neural networks  (multi-layer perceptions) to train each feature categories. Although our netural networks are not so deep, each layers has many units. This NN structure makes our model very very easily overfiting. To control these, we use dropout for all hidden layers **(drop 50% neutros)**.
+
+
+**Neutral Network Framework:**
+
+- Input Layer : 50 units 
+- Hidden Layer 1 : 100 units + Relu + 0.5 Dropout
+- Hidden Layer 2 : 500 units + Relu + 0.5 Dropout
+- Hidden Layer 3 : 10 units + Relu + 0.5 Dropout
+- Output Layer : 1 unite + sigmoid 
+- Loss Function : Binary Loss 
+- Metrics : Accuracy
 
 ![nn](images/nn.png)
 
+We do not use the final output as new features. However, **we extract the hidden layer 3 as the features.** In that sense, we will have 80 features (8*10). Actually, this feature matrix is sprase matrix with many zeros because we force it to genearte 10 features for each category. (Some category only has 2-4 features as input). 
 
+This part will add **very very strong reguliraztion** for this neutral networks. 
 
-#### 5. Deep Learning
+#### 5.2.2 XGboost
 
-After creating the final metrics, we use neural networks (multi-layer perceptions) to help us do feature engineering. A very deep neutral network helps us transform each category features at first. Then, we compress all these data into 10 dimensions. With the final target, we extract the hidden layers as new features.
+After previous step, we merge all current features together and send all these features to next model - XGBoost. We also add a very strong regularization. This part is very similar to Lightgbm.
+
+#### 5.2.3 Whole Frame
+
+pic single
+
+We split all data into 4 datasets - day 6 .. day 9. And using each single model unit to train one day data. (train dataset day 6 to predict test dataset day 6)  Then, we put them together as the final predictions. 
+
+two pics
 
 ### 5.3 Model Blend
 
 We use simple mean of all current model results to blend all model predictions. This actually gives us a more stable result although we lose the probability to reach a very high score.
 
+According to Kaggle's rules, each team can only submits their predictions 5 times per day. To save our submisstion times, we blend similar model's preditions at first and then submit it to Kaggle.
 
-## 6.0 Modelling
+I have limited time during this competition both physically and psychologically. I don't write some script to records all log and other paratmerts. This leads me to 
+
+## 6.0 Final Result and Feelings
+
+### 6.1 Feeling about this project
+
+Because we are not interested in the given dataset, Kaggle competition seems more appealing for us. Driven by this motivation, we finally choose this dataset.
+
+We worry about this dataset is too clean. So, we spend lots of time for feature engineering and modeling part. We run our current framework locally and then upload to AWS EC2. Unfortunately, all files do not be calculated finally, even if we spend a lot of money on it.
+
+<img src="images/bill.png"  width="400" />
+
+Genarlly speaking, I still find my coding ability needs to improve. With rich Kaggle hands-on experience, this time, I have tried to build everything using a well-defined framework. However, from other people's Github, I find that I still need to have a very good framework, which should record all paramters and results of public score from Kaggle. As a result, I can better control our local validation reuslt.
+
+### 6.2 Feeling about Kaggle
+
+Although in the last few hours someone shares his high-score solution, our ranking drop rapidly from the leader board. I care more about what I have learned from this competition.
+
+After waiting for a long time, I carefully read the solutions provided by 4th place, 11th place and 3rd place. I have similar feelings everytime. They control all features in very tiny details. 
+
+Although my thoughts are on the right way, details amplifies all discrenpancy. For example, 3rd place solutions (current Kaggle 1st ranking grandmaster) also uses neutral networks. But he controls overfitting very well. Moreover, he uses many very good features.
 
 ![result](images/result.png)
 
