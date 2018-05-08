@@ -37,7 +37,7 @@ Figure is from [https://www.kaggle.com/c/talkingdata-adtracking-fraud-detection/
 
 ![clickFirm](images/clickFirm.png)
 
-**Motivation to cheat:** High Click Times will increase these company's income and demostrate the importance of one certain channel but the application download times will not increase.
+**Motivation to cheat:** High Click Times will increase these company's income and demonstrate the importance of one certain channel but the application download times will not increase.
 
 #### 2.2 Malicious Parties
 ---
@@ -51,8 +51,8 @@ Besides the advertising companies, competitors and other **malicious parties** w
 With all these information, our task is to detect the "click fraud" behavior. To achieve this goal, in this document, we want to estimate :
 
 - **Probability of Application Download**: Predicted probability of each click to download the application 
-- Low probability : Fraud Click 
-- High probability : Real Click
+- Low probability: Fraud Click 
+- High probability: Real Click
 
 ## 3.0 Data Exploration 
 
@@ -87,11 +87,11 @@ Actual Dataset :
 - **Data Size**: Large data is very hard to train and it takes time
 - **Few Fields**: Unlike another dataset, all these fields are few and not directly related to final prediction.
 
-In this project, llthough we don't need to clean some data, we actually focus more time on feature engineering than other Kaggle competitions.
+In this project, although we don't need to clean some data, we actually focus more time on feature engineering than other Kaggle competitions.
 
 ### 3.2 Data Distribution
 
-To save time, I borrow some figures from: [https://www.kaggle.com/yuliagm/talkingdata-eda-plus-time-patterns](https://www.kaggle.com/yuliagm/talkingdata-eda-plus-time-patterns) and [https://www.kaggle.com/yuliagm/talkingdata-eda-plus-time-patterns](https://www.kaggle.com/yuliagm/talkingdata-eda-plus-time-patterns)
+To save time, I borrow some figures from [https://www.kaggle.com/yuliagm/talkingdata-eda-plus-time-patterns](https://www.kaggle.com/yuliagm/talkingdata-eda-plus-time-patterns)
 
 **Unique Values:** At first, we want to figure out the unique values of all different features. This will help us to determine our next steps of feature engineering.** 
 
@@ -123,7 +123,7 @@ To create more useful features, we need to understand the behaviors of fraud "us
 
 If I want to cheat using programming script, I will try to **mask my IP address**. Based on my own web crawler experience, I will use an IP pool to mask my IP addresses. However, I can't mask the "fingerprint" - operating system (os) and other information. 
 
-For example, if I need to increase the click amount for a certain app in a certain channel, we may use our current devices although we also will apply some anti-detection approaches. As a consequence, **the device, os and other information should be the same.**
+For example, if I need to increase the click amount for a certain app in a certain channel, we may use our current devices although we also will apply some anti-detection approaches. As a consequence, **the device, os, and other information should be the same.**
 
 **Conclusion A: Devices and OS or other fields may appear concurrently.**
 
@@ -133,9 +133,9 @@ For example, if I need to increase the click amount for a certain app in a certa
 
 If a new click happens, we can check **historical data** based on the timeline and then judge whether this is a fraud click. As a result, we should focus on time feature. 
 
-For example, the interval between two clicks may be a very important feature. Or, later, we only calculate the difference between current date and 1970-1-1:00:00:00.
+For example, the interval between two clicks may be a very important feature. Or, later, we only calculate the difference between the current date and 1970-1-1:00:00:00.
 
-**Conclusion B: Time related features will make sense.**
+**Conclusion B: Time-related features will make sense.**
 
 ---
 
@@ -164,7 +164,7 @@ To prepare for later feature engineering, all time features have been created at
 
 #### 4.1.1 Next Click 
 
-After sorting all data based on time, all data will be grouped by similar device, os or other informations (no more than three combinations). After this, we will calculate the time differences to for each record using similar app, os or other information. To help training process, we fill all missing valeus with -99. 
+After sorting all data based on time, all data will be grouped by similar device, os or other information (no more than three combinations). After this, we will calculate the time differences to for each record using similar app, os or other information. To help training process, we fill all missing values with -99. 
 
 ![nextClick](images/nextClick.png)
 
@@ -174,13 +174,13 @@ Similar to **Next Click**, we also check back about the data. This part will be 
 
 #### 4.1.3 Cumulate Sum
 
-After grouping all data, we calculate the cumulate sume of concurrency. 
+After grouping all data, we calculate the cumulate some of the concurrency. 
 
 ![nextClick](images/cum.png)
 
 #### 4.1.4 Statistics
 
-Using similar strategies, we also calculate the mean, variance, count and unique values of concurrency of each groups. Mean and variance is calculated because they measure the stationary of certain data series. If the series fluctuates frequently, these metrics will have large changes. Unique values will provide some information if same combinations have show up in our historical records.
+Using similar strategies, we also calculate the mean, variance, count and unique values of concurrency of each group. Mean and variance is calculated because they measure the stationary of certain data series. If the series fluctuates frequently, these metrics will have large changes. Unique values will provide some information if same combinations have shown up in our historical records.
 
 - 4.Mean 
 - 5.Variance
@@ -195,36 +195,36 @@ We also use the original 7 features including IP, Devices and so on.
 
 #### 4.1.6 Summary 
 
-Based on previous analysis and feature engineering, we use and create 8 categories features for our models. Even though some features may not work very well, we just creat them together and check them one by one. 
+Based on the previous analysis and feature engineering, we use and create 8 categories features for our models. Even though some features may not work very well, we just creat them together and check them one by one. 
 
-Actually, in the common kenels, many other features are used. For example, some people calculate prior probability like Prob(Click | Device). This feature can only be calculated in training process not in test dataset.
+Actually, in the common kernel, many other features are used. For example, some people calculate prior probability like Prob(Click | Device). This feature can only be calculated in training process not in the test dataset.
 
 ### 4.2 Feature Importance
 
-At first, we try to use XGBoost (boosting trees) to build the model. However, our personal computer will load the whole trian and test dataset for more than 5 mins (180 M lines for each file). Due to insufficient RAM, we try to find some solutions from Kaggle discussion part. 
+At first, we try to use XGBoost (boosting trees) to build the model. However, our personal computer will load the whole train and test dataset for more than 5 mins (180 M lines for each file). Due to insufficient RAM, we try to find some solutions from Kaggle discussion part. 
 
-**Suggesstions**:
+**Suggestions**:
 
 - Build Database using SQL to load data
 - Using Lightgbm to train the model
 - Using other python packages like Feature or pickle
 - Using cloud computing power
 
-In our example, this is part of our feature records using same dataset and same hyperparamters. We modify this [script](https://www.kaggle.com/asraful70/talkingdata-added-new-features-in-lightgbm/code) using Lightgbm and run this script in Amazon Web Server - Elective Container 2 (AWS EC2) to derive our final feature importance. We run the dataset many times. The issue here is that these feature importances may change if we use different dataset to generate the result. As a consequence, we relize that we should try to use different parts of the dataset to train our model.
+In our example, this is part of our feature records using same dataset and same hyperparameters. We modify this [script](https://www.kaggle.com/asraful70/talkingdata-added-new-features-in-lightgbm/code) using Lightgbm and run this script in Amazon Web Server - Elective Container 2 (AWS EC2) to derive our final feature importance. We run the dataset many times. The issue here is that these feature importance may change if we use a different dataset to generate the result. As a consequence, we realize that we should try to use different parts of the dataset to train our model.
 
 ![importRecord](images/importRecord.png)
 
-**First Round Filter:** At first, we keep all features will accuracy more than 0.95 from the validation set. However, we notice that these featutures are very likely to be overfitting. 
+**First Round Filter:** At first, we keep all features will accuracy more than 0.95 from the validation set. However, we notice that these features are very likely to be overfitting. 
 
-**Second Round Filter:** Although correlation matrix will help us identify relationship between different features, we finally decided to use Lightgbm feature importance figure to guide use. Below graph is the feature importance (We use X0 to X8 because too many combinations, which makes it hard to find corresponding code to modify...).
+**Second Round Filter:** Although correlation matrix will help us identify the relationship between different features, we finally decided to use Lightgbm feature importance figure to guide use. Below the graph is the feature importance (We use X0 to X8 because too many combinations, which makes it hard to find corresponding code to modify...).
 
 ![featureImport](images/featureImport.png)
 
-**Third Round Filter:** Some features related to time are very important. However, our current algorithems are very slow to compute all required features. As a consequence, we use some "rough" calculations to replace "accurate" calculations. This approach is manily prepared for time related features.  
+**Third Round Filter:** Some features related to time is very important. However, our current algorithms are very slow to compute all required features. As a consequence, we use some "rough" calculations to replace "accurate" calculations. This approach is mainly prepared for time-related features.  
 
 **Computing Power Assistance**
 
-To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We are very busy with current **take-home exams**. Moreover, to compute all data rapidly, we need many CPUs and RAM for accelartion of current training process. Even if we use this powerful instance, each training will cost 2-3 hours. Each model will occupy nearly 13.3 GB RAM. Each time, we will train nearly 8 models (This will be discussed later). And, we only have no more than three days for this competition.  
+To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We are very busy with current **take-home exams**. Moreover, to compute all data rapidly, we need many CPUs and RAM for acceleration of current training process. Even if we use this powerful instance, each training will cost 2-3 hours. Each model will occupy nearly 13.3 GB RAM. Each time, we will train nearly 8 models (This will be discussed later). And, we only have no more than three days for this competition.  
 
 [Figure Link](https://aws.amazon.com/blogs/aws/expanding-the-m4-instance-type-new-m4-16xlarge/)
 
@@ -233,15 +233,15 @@ To achieve this, we deploy AWS EC2 m4.16xlarge instance to train our model. We a
 
 ## 5.0 Modelling
 
-### 5.1 Chaning Dataset and hyperparameters - Lightbgm and Neutral Network
+### 5.1 Changing Dataset and hyperparameters - Lightbgm and Neural Network
 
-Our first model is Lightbgm and next it netrual networks. Because Lightgbm and XBoost are very very similar. So, we want to use these "familar" models. According to the kernels at that time, people have relized that different dataset will have different results. As a reuslt, we build many Lightgbm models using different dataset. 
+Our first model is Lightbgm and next to its neural networks. Because Lightgbm and XBoost are very very similar. So, we want to use these "familiar" models. According to the kernels at that time, people have realized that different dataset will have different results. As a result, we build many Lightgbm models using different dataset. 
 
 Af first, we will split our training dataset based on different days - Day 6, Day 7, Day 8, Day 9. This also corresponds to our insights from time pattern (no time patterns). 
 
-For the training part, we use Day 6, Day 7, Day 8 and Day 9 seperately to train the model, then Day 6, Day 7, Day 8 and Day 9 as validation dataset. Day 6 has 10M data, Day 7 has 50M, Day 8 has 50M, Day 9 has 40M.
+For the training part, we use Day 6, Day 7, Day 8 and Day 9 separately to train the model, then Day 6, Day 7, Day 8 and Day 9 as validation dataset. Day 6 has 10M data, Day 7 has 50M, Day 8 has 50M, Day 9 has 40M.
 
-Genarlly Speaking models are as follow : (Here.. I forget the results.. )
+Generally Speaking, models are as follow : (Here.. I forget the results.. )
 <p align="center">
 
 | Training Dataset  | Validation Dataset | 
@@ -255,7 +255,7 @@ Genarlly Speaking models are as follow : (Here.. I forget the results.. )
 |...| ...| 
 </p>
 
-After confirming the dataset to use as trianing and validating dataset, we try to trune the parameters. (Here, we also use the full dataset to train the model, this gives us better result.) Here, we have nearly **10-30 models**, I don't remember actually. Because I blend each ten models and submit it to public board to test my guess and model. Then, we will decide next steps.
+After confirming the dataset to use as training and validating dataset, we try to tune the parameters. (Here, we also use the full dataset to train the model, this gives us a better result.) Here, we have nearly **10-30 models**, I don't remember actually. Because I blend every ten models and submit it to the public board to test my guess and model. Then, we will decide next steps.
 
 ### 5.2 Self-defined Models
 
@@ -263,7 +263,7 @@ We build a model using previous models.
 
 #### 5.2.1 Feature Generation
 
-Inspired by previous models, we use 8 neural networks  (multi-layer perceptions) to train each feature categories. Although our netural networks are not so deep, each layers has many units. This NN structure makes our model very very easily overfiting. To control these, we use dropout for all hidden layers **(drop 50% neutros)**.
+Inspired by previous models, we use 8 neural networks  (multi-layer perceptions) to train each feature categories. Although our neural networks are not so deep, each layer has many units. This NN structure makes our model very very easily overfitting. To control these, we use dropout for all hidden layers **(drop 50% neutrons)**.
 
 
 **Neutral Network Framework:**
@@ -278,51 +278,51 @@ Inspired by previous models, we use 8 neural networks  (multi-layer perceptions)
 
 ![nn](images/nn.png)
 
-We do not use the final output as new features. However, **we extract the hidden layer 3 as the features.** In that sense, we will have 80 features (8*10). Actually, this feature matrix is sprase matrix with many zeros because we force it to genearte 10 features for each category. (Some category only has 2-4 features as input). 
+We do not use the final output as new features. However, **we extract the hidden layer 3 as the features.** In that sense, we will have 80 features (8*10). Actually, this feature matrix is a sparse matrix with many zeros because we force it to generate 10 features for each category. (Some category only has 2-4 features as input). 
 
-This part will add **very very strong reguliraztion** for this neutral networks. 
+This part will add **very very strong regulation** for this neutral networks. 
 
 #### 5.2.2 XGboost
 
-After previous step, we merge all current features together and send all these features to next model - XGBoost. We also add a very strong regularization. This part is very similar to Lightgbm.
+After the previous step, we merge all current features together and send all these features to next model - XGBoost. We also add a very strong regularization. This part is very similar to Lightgbm.
 
 #### 5.2.3 Whole Frame
 
 pic single
 
-We split all data into 4 datasets - day 6 .. day 9. And using each single model unit to train one day data. (train dataset day 6 to predict test dataset day 6)  Then, we put them together as the final predictions. 
+We split all data into 4 datasets - day 6 .. day 9. And using each single model unit to train one-day data. (train dataset day 6 to predict test dataset day 6)  Then, we put them together as the final predictions. 
 
 two pics
 
 ### 5.3 Model Blend
 
-We use simple mean of all current model results to blend all model predictions. This actually gives us a more stable result although we lose the probability to reach a very high score.
+We use a simple mean of all current model results to blend all model predictions. This actually gives us a more stable result although we lose the probability to reach a very high score.
 
-According to Kaggle's rules, each team can only submits their predictions 5 times per day. To save our submisstion times, we blend similar model's preditions at first and then submit it to Kaggle.
+According to Kaggle's rules, each team can only submit their predictions 5 times per day. To save our submission times, we blend similar model's predictions at first and then submit it to Kaggle.
 
-I have limited time during this competition both physically and psychologically. I don't write some script to records all log and other paratmerts. This leads me to 
+I have limited time to this competition both physically and psychologically. I don't write some script to records all log and other parameters. This leads me to 
 
 ## 6.0 Final Result and Feelings
 
 ### 6.1 Feeling about this project
 
-Because we are not interested in the given dataset, Kaggle competition seems more appealing for us. Driven by this motivation, we finally choose this dataset.
+Because we are not interested in the given dataset, Kaggle competition seems more appealing to us. Driven by this motivation, we finally choose this dataset.
 
 We worry about this dataset is too clean. So, we spend lots of time for feature engineering and modeling part. We run our current framework locally and then upload to AWS EC2. Unfortunately, all files do not be calculated finally, even if we spend a lot of money on it.
 
 <img src="images/bill.png"  width="400" />
 
-Genarlly speaking, I still find my coding ability needs to improve. With rich Kaggle hands-on experience, this time, I have tried to build everything using a well-defined framework. However, from other people's Github, I find that I still need to have a very good framework, which should record all paramters and results of public score from Kaggle. As a result, I can better control our local validation reuslt.
+Generally speaking, I still find my coding ability needs to improve. With rich Kaggle hands-on experience, this time, I have tried to build everything using a well-defined framework. However, from other people's Github, I find that I still need to have a very good framework, which should record all parameters and results of the public score from Kaggle. As a result, I can better control our local validation result.
 
 ### 6.2 Feeling about Kaggle
 
-Although in the last few hours someone shares his high-score solution, our ranking drop rapidly from the leader board. I care more about what I have learned from this competition.
+Although in the last few hours someone shares his high-score solution, our ranking drops rapidly from the leaderboard. I care more about what I have learned from this competition.
 
-After waiting for a long time, I carefully read the solutions provided by 4th place, 11th place and 3rd place. I have similar feelings everytime. They control all features in very tiny details. 
+After waiting for a long time, I carefully read the solutions provided by 4th place, 11th place, and 3rd place. I have similar feelings every time. They control all features in very tiny details. 
 
-Although my thoughts are on the right way, details amplifies all discrenpancy. For example, 3rd place solutions (current Kaggle 1st ranking grandmaster) also uses neutral networks. But he controls overfitting very well. Moreover, he uses many very good features.
+Although my thoughts are on the right way, details amplify all discrepancy. For example, 3rd place solutions (current Kaggle 1st ranking grandmaster) also use neural networks. But he controls overfitting very well. Moreover, he uses many very good features.
 
-![result](images/result.png)
+<!--![result](images/result.png)-->
 
 
 
