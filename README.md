@@ -322,8 +322,7 @@ After waiting for a long time, I carefully read the solutions provided by 4th pl
 
 Although my thoughts are on the right way, details amplify all discrepancy. For example, 3rd place solutions (current Kaggle 1st ranking grandmaster) also use neural networks. But he controls overfitting very well. Moreover, he uses many very good features.
 
-<!--![result](images/result.png)-->
-
+![result](images/result.png)
 
 
 
